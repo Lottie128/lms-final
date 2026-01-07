@@ -2,8 +2,8 @@
   "buildCommand": "cd packages/frontend && cp -r ../shared ./shared && npm install && npm run build",
   "outputDirectory": "packages/frontend/dist",
   "framework": "vite",
-  "installCommand": "npm install --prefix packages/frontend",
-  "devCommand": "npm run dev --prefix packages/frontend",
+  "installCommand": "cd packages/frontend && npm install",
+  "devCommand": "cd packages/frontend && npm run dev",
   "rewrites": [
     {
       "source": "/(.*)",
