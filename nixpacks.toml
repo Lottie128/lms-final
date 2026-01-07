@@ -14,4 +14,4 @@ cmds = [
 ]
 
 [start]
-cmd = 'cd packages/backend && bash start.sh'
+cmd = 'bash packages/backend/start.sh'
