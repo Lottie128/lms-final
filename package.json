@@ -8,7 +8,7 @@
     "dev:all": "concurrently \"bun run dev:frontend\" \"bun run dev:backend\"",
     "dev:frontend": "cd packages/frontend && bun run dev",
     "dev:backend": "cd packages/backend && bun run dev",
-    "build": "bun run build:frontend && bun run build:backend",
+    "build": "bun run build:backend",
     "build:frontend": "cd packages/frontend && bun run build",
     "build:backend": "cd packages/backend && bun run build",
     "start": "bun run start:backend",
@@ -20,6 +20,7 @@
     "type-check": "cd packages/frontend && bun run type-check && cd ../backend && bun run type-check",
     "db:migrate": "cd packages/backend && bun run db:migrate",
     "db:generate": "cd packages/backend && bun run db:generate",
+    "db:push": "cd packages/backend && bun run db:push",
     "db:seed": "cd packages/backend && bun run db:seed",
     "db:studio": "cd packages/backend && bun run db:studio",
     "test": "bun run test:frontend && bun run test:backend",
@@ -27,6 +28,11 @@
     "test:backend": "cd packages/backend && bun run test",
     "test:e2e": "cd packages/frontend && bun run test:e2e"
   },
+  "workspaces": [
+    "packages/frontend",
+    "packages/backend",
+    "packages/shared"
+  ],
   "dependencies": {
     "shared": "workspace:*"
   },
@@ -39,4 +45,7 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "bun": ": 
+    "bun": ">=1.0.0",
+    "node": ">=18.0.0"
+  }
+}
