@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Clock, Users, PlayCircle, CheckCircle } from 'lucide-react';
@@ -13,15 +13,17 @@ import type { Course, Lesson } from 'shared/types';
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: courseData, isLoading } = useQuery({
+  const { data: courseData, isLoading, error } = useQuery({
     queryKey: ['course', id],
     queryFn: async () => {
       const response = await api.get(`/courses/${id}`);
       return response.data.data;
     },
     enabled: !!id,
+    retry: 1,
   });
 
   const { data: enrollmentData } = useQuery({
@@ -57,9 +59,28 @@ export default function CourseDetail() {
     );
   }
 
+  if (error || !courseData) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center py-20">
+          <BookOpen className="w-16 h-16 text-light-text-secondary dark:text-dark-text-secondary mb-4" />
+          <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
+            Course Not Found
+          </h2>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
+            This course doesn't exist or has been removed.
+          </p>
+          <Button onClick={() => navigate('/courses')} icon={<ArrowLeft className="w-4 h-4" />}>
+            Back to Courses
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   const course: Course = courseData;
   const isEnrolled = !!enrollmentData;
-  const isOwner = user?.role === 'TEACHER' && course.teacherId === user.id;
+  const isOwner = user?.role === 'TEACHER' && course.teacherId === user?.id;
 
   return (
     <DashboardLayout>
@@ -87,7 +108,7 @@ export default function CourseDetail() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="inline-block px-3 py-1 rounded-full bg-accent/10 dark:bg-accent-dark/10 text-accent dark:text-accent-dark text-sm font-medium mb-4">
-                  {course.category}
+                  {course.category || 'General'}
                 </div>
                 <CardTitle className="text-3xl mb-3">{course.title}</CardTitle>
                 <CardDescription className="text-base">{course.description}</CardDescription>
@@ -96,7 +117,7 @@ export default function CourseDetail() {
                 <div className="flex flex-wrap gap-6 mt-6 text-light-text-secondary dark:text-dark-text-secondary">
                   <div className="flex items-center gap-2">
                     <Users className="w-5 h-5" />
-                    <span>{course.teacher?.name}</span>
+                    <span>{course.teacher?.name || 'Instructor'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-5 h-5" />
