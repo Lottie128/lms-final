@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { supabase } from './supabase';
 
 const api = axios.create({
@@ -10,7 +10,7 @@ const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  async (config: AxiosRequestConfig) => {
+  async (config: InternalAxiosRequestConfig) => {
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -37,4 +37,5 @@ api.interceptors.response.use(
   }
 );
 
+export { api };
 export default api;
