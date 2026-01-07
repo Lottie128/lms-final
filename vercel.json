@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cp -r ../shared ./shared && npm install && npm run build",
+  "buildCommand": "cp -r ../shared ./shared && npm install && ls -la && pwd && npm run build && ls -la dist || echo 'Dist not created'",
   "outputDirectory": "packages/frontend/dist",
   "framework": "vite",
   "installCommand": "echo 'Skipping root install'",
