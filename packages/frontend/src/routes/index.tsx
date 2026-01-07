@@ -1,85 +1,60 @@
-import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Loader } from '../components/ui/Loader';
 
 // Lazy load pages
-const HomePage = lazy(() => import('../pages/Home'));
-const LoginPage = lazy(() => import('../pages/Login'));
-const SignUpPage = lazy(() => import('../pages/SignUp'));
-const DashboardPage = lazy(() => import('../pages/Dashboard'));
-const CoursesPage = lazy(() => import('../pages/Courses'));
-const CourseDetailPage = lazy(() => import('../pages/CourseDetail'));
+const Home = lazy(() => import('../pages/Home'));
+const Login = lazy(() => import('../pages/Login'));
+const SignUp = lazy(() => import('../pages/SignUp'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const Courses = lazy(() => import('../pages/Courses'));
+const CourseDetail = lazy(() => import('../pages/CourseDetail'));
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <Loader fullScreen text="Loading..." />;
+    return <Loader fullScreen />;
   }
 
-  return user ? <>{children}</> : <Navigate to="/login" replace />;
-}
-
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <Loader fullScreen text="Loading..." />;
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
-  return !user ? <>{children}</> : <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
 }
 
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<HomePage />} />
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <SignUpPage />
-          </PublicRoute>
-        }
-      />
-
-      {/* Private routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
       <Route
         path="/dashboard"
         element={
-          <PrivateRoute>
-            <DashboardPage />
-          </PrivateRoute>
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/courses"
         element={
-          <PrivateRoute>
-            <CoursesPage />
-          </PrivateRoute>
+          <ProtectedRoute>
+            <Courses />
+          </ProtectedRoute>
         }
       />
       <Route
         path="/courses/:id"
         element={
-          <PrivateRoute>
-            <CourseDetailPage />
-          </PrivateRoute>
+          <ProtectedRoute>
+            <CourseDetail />
+          </ProtectedRoute>
         }
       />
-
-      {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
