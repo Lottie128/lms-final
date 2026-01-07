@@ -4,9 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "start": "tsx src/index.ts",
-    "start:bun": "bun run src/index.ts",
-    "build": "echo 'No build needed - running with tsx'",
+    "start": "bun run src/index.ts",
+    "build": "echo 'No build needed - running with Bun'",
     "db:migrate": "bunx prisma migrate dev",
     "db:generate": "bunx prisma generate",
     "db:push": "bunx prisma db push",
@@ -22,7 +21,6 @@
     "@elysiajs/cors": "^0.8.0",
     "@elysiajs/jwt": "^0.8.0",
     "@elysiajs/swagger": "^0.8.0",
-    "tsx": "^4.7.0",
     "shared": "workspace:*"
   },
   "devDependencies": {
