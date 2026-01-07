@@ -28,14 +28,6 @@
     "test:backend": "cd packages/backend && bun run test",
     "test:e2e": "cd packages/frontend && bun run test:e2e"
   },
-  "workspaces": [
-    "packages/frontend",
-    "packages/backend",
-    "packages/shared"
-  ],
-  "dependencies": {
-    "shared": "workspace:*"
-  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
