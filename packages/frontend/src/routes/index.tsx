@@ -12,6 +12,9 @@ const Courses = lazy(() => import('../pages/Courses'));
 const CourseDetail = lazy(() => import('../pages/CourseDetail'));
 const CreateCourse = lazy(() => import('../pages/CreateCourse'));
 const EmailConfirmation = lazy(() => import('../pages/EmailConfirmation'));
+const Profile = lazy(() => import('../pages/Profile'));
+const Settings = lazy(() => import('../pages/Settings'));
+const MyCourses = lazy(() => import('../pages/MyCourses'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -66,6 +69,30 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <Courses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-courses"
+        element={
+          <ProtectedRoute>
+            <MyCourses />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         }
       />
