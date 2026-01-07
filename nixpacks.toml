@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['...', 'curl', 'unzip']
+nixPkgs = ['...', 'curl', 'unzip', 'bash']
 
 [phases.install]
 cmds = [
@@ -9,8 +9,9 @@ cmds = [
 
 [phases.build]
 cmds = [
-  'cd packages/backend && ~/.bun/bin/bunx prisma generate'
+  'cd packages/backend && ~/.bun/bin/bunx prisma generate',
+  'chmod +x packages/backend/start.sh'
 ]
 
 [start]
-cmd = 'cd packages/backend && ~/.bun/bin/bun run src/index.ts'
+cmd = 'cd packages/backend && bash start.sh'
