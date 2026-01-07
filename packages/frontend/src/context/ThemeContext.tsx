@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { THEME_STORAGE_KEY, type Theme } from 'shared/constants';
+import { THEME_STORAGE_KEY, type Theme } from '../constants';
 
 interface ThemeContextType {
   theme: Theme;
@@ -21,7 +21,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     root.classList.remove('light', 'dark');
     body.classList.remove('light', 'dark');
-
     root.classList.add(theme);
     body.classList.add(theme);
 
