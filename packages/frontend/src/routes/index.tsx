@@ -10,6 +10,8 @@ const SignUp = lazy(() => import('../pages/SignUp'));
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const Courses = lazy(() => import('../pages/Courses'));
 const CourseDetail = lazy(() => import('../pages/CourseDetail'));
+const CreateCourse = lazy(() => import('../pages/CreateCourse'));
+const EmailConfirmation = lazy(() => import('../pages/EmailConfirmation'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -25,12 +27,32 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function TeacherRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <Loader fullScreen />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/auth/confirm" element={<EmailConfirmation />} />
+      
       <Route
         path="/dashboard"
         element={
@@ -45,6 +67,14 @@ export function AppRoutes() {
           <ProtectedRoute>
             <Courses />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/courses/create"
+        element={
+          <TeacherRoute>
+            <CreateCourse />
+          </TeacherRoute>
         }
       />
       <Route
