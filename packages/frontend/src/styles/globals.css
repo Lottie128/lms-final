@@ -4,17 +4,17 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-gray-300 dark:border-gray-600;
   }
 
   body {
-    @apply bg-light-bg text-light-text-primary transition-colors duration-300;
+    @apply bg-white text-gray-900 transition-colors duration-300;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 
   body.dark {
-    @apply bg-dark-bg text-dark-text-primary;
+    @apply bg-gray-900 text-gray-100;
   }
 
   /* Custom scrollbar */
@@ -23,25 +23,25 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-light-surface-secondary dark:bg-dark-surface-secondary;
+    @apply bg-gray-100 dark:bg-gray-800;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-light-text-secondary dark:bg-dark-text-secondary rounded-full;
+    @apply bg-gray-400 dark:bg-gray-600 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-light-text-primary dark:bg-dark-text-primary;
+    @apply bg-gray-500 dark:bg-gray-500;
   }
 }
 
 @layer components {
   /* Glass morphism effect */
   .glass {
-    @apply bg-white/70 dark:bg-dark-surface/80;
-    @apply backdrop-blur-glass;
-    @apply border border-white/20 dark:border-dark-border/20;
-    @apply shadow-glass dark:shadow-glass-dark;
+    @apply bg-white/70 dark:bg-gray-800/80;
+    @apply backdrop-blur-lg;
+    @apply border border-white/20 dark:border-gray-700/20;
+    @apply shadow-lg dark:shadow-2xl;
   }
 
   .glass-card {
@@ -61,33 +61,33 @@
 
   .btn-primary {
     @apply btn;
-    @apply bg-accent hover:bg-accent-hover dark:bg-accent-dark dark:hover:bg-accent-dark-hover;
+    @apply bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600;
     @apply text-white;
-    @apply focus:ring-accent dark:focus:ring-accent-dark;
+    @apply focus:ring-indigo-500 dark:focus:ring-indigo-400;
   }
 
   .btn-secondary {
     @apply btn;
-    @apply bg-light-surface dark:bg-dark-surface;
-    @apply text-light-text-primary dark:text-dark-text-primary;
-    @apply hover:bg-light-surface-secondary dark:hover:bg-dark-surface-secondary;
-    @apply border border-light-border dark:border-dark-border;
+    @apply bg-gray-100 dark:bg-gray-800;
+    @apply text-gray-900 dark:text-gray-100;
+    @apply hover:bg-gray-200 dark:hover:bg-gray-700;
+    @apply border border-gray-300 dark:border-gray-600;
   }
 
   .btn-ghost {
     @apply btn;
-    @apply bg-transparent hover:bg-light-surface-secondary dark:hover:bg-dark-surface-secondary;
-    @apply text-light-text-primary dark:text-dark-text-primary;
+    @apply bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800;
+    @apply text-gray-900 dark:text-gray-100;
   }
 
   /* Input styles */
   .input {
     @apply w-full px-4 py-2 rounded-lg;
-    @apply bg-light-surface dark:bg-dark-surface;
-    @apply border border-light-border dark:border-dark-border;
-    @apply text-light-text-primary dark:text-dark-text-primary;
-    @apply placeholder:text-light-text-secondary dark:placeholder:text-dark-text-secondary;
-    @apply focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-dark;
+    @apply bg-white dark:bg-gray-800;
+    @apply border border-gray-300 dark:border-gray-600;
+    @apply text-gray-900 dark:text-gray-100;
+    @apply placeholder:text-gray-500 dark:placeholder:text-gray-400;
+    @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400;
     @apply transition-all duration-200;
   }
 
@@ -98,25 +98,56 @@
 
   /* Animation utilities */
   .animate-in {
-    @apply animate-fade-in;
+    animation: fadeIn 0.3s ease-in;
   }
 
   .animate-slide-up {
-    @apply animate-slide-up;
+    animation: slideUp 0.3s ease-out;
   }
 
   .animate-slide-down {
-    @apply animate-slide-down;
+    animation: slideDown 0.3s ease-out;
   }
 }
 
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    @apply bg-gradient-to-r from-accent to-accent-hover dark:from-accent-dark dark:to-accent-dark-hover;
+    @apply bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400;
   }
 
   .bg-gradient-primary {
-    @apply bg-gradient-to-br from-accent to-accent-hover dark:from-accent-dark dark:to-accent-dark-hover;
+    @apply bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
