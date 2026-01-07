@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { AppRoutes } from './routes';
 import { Loader } from './components/ui/Loader';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Suspense } from 'react';
 
 const queryClient = new QueryClient({
@@ -18,17 +19,19 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ThemeProvider>
-          <AuthProvider>
-            <Suspense fallback={<Loader fullScreen />}>
-              <AppRoutes />
-            </Suspense>
-          </AuthProvider>
-        </ThemeProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ThemeProvider>
+            <AuthProvider>
+              <Suspense fallback={<Loader fullScreen />}>
+                <AppRoutes />
+              </Suspense>
+            </AuthProvider>
+          </ThemeProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
