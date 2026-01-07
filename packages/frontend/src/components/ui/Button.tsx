@@ -24,19 +24,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+      'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variants = {
       primary:
-        'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
+        'bg-gradient-to-r from-accent to-accent-dark dark:from-accent-dark dark:to-accent text-white hover:opacity-90 focus:ring-accent dark:focus:ring-accent-dark',
       secondary:
-        'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
+        'bg-light-surface-secondary dark:bg-dark-surface-secondary text-light-text-primary dark:text-dark-text-primary hover:bg-light-border dark:hover:bg-dark-border focus:ring-accent dark:focus:ring-accent-dark',
       outline:
-        'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 focus:ring-indigo-500',
+        'border-2 border-accent dark:border-accent-dark text-accent dark:text-accent-dark hover:bg-accent/10 dark:hover:bg-accent-dark/10 focus:ring-accent dark:focus:ring-accent-dark',
       ghost:
-        'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
+        'text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-surface-secondary dark:hover:bg-dark-surface-secondary focus:ring-accent dark:focus:ring-accent-dark',
       danger:
-        'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+        'bg-error dark:bg-error-dark text-white hover:opacity-90 focus:ring-error dark:focus:ring-error-dark',
     };
 
     const sizes = {
