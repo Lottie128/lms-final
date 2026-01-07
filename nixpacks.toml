@@ -4,19 +4,15 @@ nixPkgs = ['...', 'curl', 'unzip']
 [phases.install]
 cmds = [
   'curl -fsSL https://bun.sh/install | bash',
-  'export BUN_INSTALL="$HOME/.bun"',
-  'export PATH="$BUN_INSTALL/bin:$PATH"',
-  'bun install'
+  '~/.bun/bin/bun install'
 ]
 
 [phases.build]
 cmds = [
-  'export BUN_INSTALL="$HOME/.bun"',
-  'export PATH="$BUN_INSTALL/bin:$PATH"',
-  'cd packages/backend && bun install',
-  'cd packages/backend && bunx prisma generate',
-  'cd packages/backend && bun run build'
+  'cd packages/backend && ~/.bun/bin/bun install',
+  'cd packages/backend && ~/.bun/bin/bunx prisma generate',
+  'cd packages/backend && ~/.bun/bin/bun run build'
 ]
 
 [start]
-cmd = 'export BUN_INSTALL="$HOME/.bun" && export PATH="$BUN_INSTALL/bin:$PATH" && cd packages/backend && bun run start'
+cmd = 'cd packages/backend && ~/.bun/bin/bun run start'
