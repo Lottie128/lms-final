@@ -4,17 +4,13 @@
 
 @layer base {
   * {
-    @apply border-gray-300 dark:border-gray-600;
+    @apply border-light-border dark:border-dark-border;
   }
 
   body {
-    @apply bg-white text-gray-900 transition-colors duration-300;
+    @apply bg-light-bg dark:bg-dark-bg text-light-text-primary dark:text-dark-text-primary transition-colors duration-300;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: 'rlig' 1, 'calt' 1;
-  }
-
-  body.dark {
-    @apply bg-gray-900 text-gray-100;
   }
 
   /* Custom scrollbar */
@@ -23,24 +19,24 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100 dark:bg-gray-800;
+    @apply bg-light-surface-secondary dark:bg-dark-surface-secondary;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+    @apply bg-light-text-secondary dark:bg-dark-text-secondary rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500 dark:bg-gray-500;
+    @apply bg-light-primary dark:bg-dark-primary;
   }
 }
 
 @layer components {
   /* Glass morphism effect */
   .glass {
-    @apply bg-white/70 dark:bg-gray-800/80;
+    @apply bg-light-surface/70 dark:bg-dark-surface/80;
     @apply backdrop-blur-lg;
-    @apply border border-white/20 dark:border-gray-700/20;
+    @apply border border-light-border/20 dark:border-dark-border/20;
     @apply shadow-lg dark:shadow-2xl;
   }
 
@@ -61,33 +57,33 @@
 
   .btn-primary {
     @apply btn;
-    @apply bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600;
+    @apply bg-accent hover:bg-accent-hover dark:bg-accent-dark dark:hover:bg-accent-dark-hover;
     @apply text-white;
-    @apply focus:ring-indigo-500 dark:focus:ring-indigo-400;
+    @apply focus:ring-accent dark:focus:ring-accent-dark;
   }
 
   .btn-secondary {
     @apply btn;
-    @apply bg-gray-100 dark:bg-gray-800;
-    @apply text-gray-900 dark:text-gray-100;
-    @apply hover:bg-gray-200 dark:hover:bg-gray-700;
-    @apply border border-gray-300 dark:border-gray-600;
+    @apply bg-light-surface-secondary dark:bg-dark-surface-secondary;
+    @apply text-light-text-primary dark:text-dark-text-primary;
+    @apply hover:bg-light-border dark:hover:bg-dark-border;
+    @apply border border-light-border dark:border-dark-border;
   }
 
   .btn-ghost {
     @apply btn;
-    @apply bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800;
-    @apply text-gray-900 dark:text-gray-100;
+    @apply bg-transparent hover:bg-light-surface-secondary dark:hover:bg-dark-surface-secondary;
+    @apply text-light-text-primary dark:text-dark-text-primary;
   }
 
   /* Input styles */
   .input {
     @apply w-full px-4 py-2 rounded-lg;
-    @apply bg-white dark:bg-gray-800;
-    @apply border border-gray-300 dark:border-gray-600;
-    @apply text-gray-900 dark:text-gray-100;
-    @apply placeholder:text-gray-500 dark:placeholder:text-gray-400;
-    @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400;
+    @apply bg-light-surface dark:bg-dark-surface;
+    @apply border border-light-border dark:border-dark-border;
+    @apply text-light-text-primary dark:text-dark-text-primary;
+    @apply placeholder:text-light-text-secondary dark:placeholder:text-dark-text-secondary;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accent-dark;
     @apply transition-all duration-200;
   }
 
@@ -113,11 +109,11 @@
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    @apply bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400;
+    @apply bg-gradient-to-r from-accent to-accent-dark;
   }
 
   .bg-gradient-primary {
-    @apply bg-gradient-to-br from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500;
+    @apply bg-gradient-to-br from-accent to-accent-dark;
   }
 }
 
