@@ -9,9 +9,8 @@ cmds = [
 
 [phases.build]
 cmds = [
-  'cd packages/backend && ~/.bun/bin/bun install',
-  'cd packages/backend && ~/.bun/bin/bunx prisma generate',
-  'cd packages/backend && ~/.bun/bin/bun run build'
+  'cd packages/backend && npm install tsx',
+  'cd packages/backend && ~/.bun/bin/bunx prisma generate'
 ]
 
 [start]
