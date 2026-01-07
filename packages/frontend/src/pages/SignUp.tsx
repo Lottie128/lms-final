@@ -1,24 +1,20 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, UserCircle } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { ThemeToggle } from '../components/ui/ThemeToggle';
-import { Card } from '../components/ui/Card';
-import { UserRole } from 'shared/types';
+import { UserPlus, Mail, Lock, User, AlertCircle } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+import type { UserRole } from '../../../shared/types';
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     password: '',
     confirmPassword: '',
+    fullName: '',
     role: 'STUDENT' as UserRole,
   });
 
@@ -31,163 +27,167 @@ export default function SignUp() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
       return;
     }
 
     setLoading(true);
 
     try {
-      await signUp(formData.email, formData.password, formData.name, formData.role);
+      await signUp({
+        email: formData.email,
+        password: formData.password,
+        name: formData.fullName,
+        role: formData.role,
+      });
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to sign up');
+      setError(err.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-light-bg via-light-surface-secondary to-light-bg dark:from-dark-bg dark:via-dark-surface-secondary dark:to-dark-bg">
-      {/* Theme toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <motion.h1
-            className="text-4xl font-bold text-gradient mb-2"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            IQ Didactic
-          </motion.h1>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">
-            Join thousands of learners worldwide
-          </p>
-        </div>
-
-        {/* Signup Card */}
-        <Card hover={false} className="p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
-              Create Account
-            </h2>
-            <p className="text-light-text-secondary dark:text-dark-text-secondary">
-              Start your learning journey today
-            </p>
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-600 to-cyan-600 rounded-full mb-4">
+              <UserPlus className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
+            <p className="text-gray-600 mt-2">Join IQ Didactic today</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="p-3 rounded-lg bg-error/10 dark:bg-error-dark/10 border border-error dark:border-error-dark text-error dark:text-error-dark text-sm"
-              >
-                {error}
-              </motion.div>
-            )}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+            >
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-600">{error}</p>
+            </motion.div>
+          )}
 
-            <Input
-              label="Full Name"
-              type="text"
-              placeholder="John Doe"
-              icon={<User className="w-5 h-5" />}
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-
-            <Input
-              label="Email"
-              type="email"
-              placeholder="your@email.com"
-              icon={<Mail className="w-5 h-5" />}
-              value={formData.email}
-              onChange={e => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
-                I am a...
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full Name
               </label>
-              <div className="grid grid-cols-2 gap-3">
-                {(['STUDENT', 'TEACHER'] as const).map(role => (
-                  <motion.button
-                    key={role}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, role })}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      formData.role === role
-                        ? 'border-accent dark:border-accent-dark bg-accent/10 dark:bg-accent-dark/10'
-                        : 'border-light-border dark:border-dark-border hover:border-accent/50 dark:hover:border-accent-dark/50'
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <UserCircle className="w-8 h-8 mx-auto mb-2 text-accent dark:text-accent-dark" />
-                    <p className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-                      {role.charAt(0) + role.slice(1).toLowerCase()}
-                    </p>
-                  </motion.button>
-                ))}
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fullName: e.target.value })
+                  }
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  placeholder="John Doe"
+                />
               </div>
             </div>
 
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              icon={<Lock className="w-5 h-5" />}
-              value={formData.password}
-              onChange={e => setFormData({ ...formData, password: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
 
-            <Input
-              label="Confirm Password"
-              type="password"
-              placeholder="••••••••"
-              icon={<Lock className="w-5 h-5" />}
-              value={formData.confirmPassword}
-              onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
-              required
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
 
-            <Button
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    setFormData({ ...formData, confirmPassword: e.target.value })
+                  }
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                I am a
+              </label>
+              <select
+                value={formData.role}
+                onChange={(e) =>
+                  setFormData({ ...formData, role: e.target.value as UserRole })
+                }
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+              >
+                <option value="STUDENT">Student</option>
+                <option value="TEACHER">Teacher</option>
+              </select>
+            </div>
+
+            <button
               type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              loading={loading}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-indigo-600 to-cyan-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-cyan-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
-            </Button>
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-light-text-secondary dark:text-dark-text-secondary">
-              Already have an account?{' '}
-              <Link
-                to="/login"
-                className="text-accent dark:text-accent-dark hover:underline font-medium"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </Card>
+          <p className="text-center text-gray-600 mt-6">
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="text-indigo-600 hover:text-indigo-700 font-semibold"
+            >
+              Sign In
+            </Link>
+          </p>
+        </div>
       </motion.div>
     </div>
   );
