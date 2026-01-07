@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cp -r ./packages/shared ./packages/frontend/shared && cd packages/frontend && npm install && npm run build",
+  "buildCommand": "pwd && ls -la && ls -la packages/ && cp -r packages/shared packages/frontend/shared && cd packages/frontend && npm install && npm run build",
   "outputDirectory": "packages/frontend/dist",
   "framework": "vite",
   "installCommand": "echo 'Skipping root install'",
