@@ -9,7 +9,7 @@ cmds = [
 
 [phases.build]
 cmds = [
-  'cd packages/backend && ~/.bun/bin/bunx prisma generate',
+  'cd packages/backend && ~/.bun/bin/bun run node_modules/.bin/prisma generate',
   'chmod +x packages/backend/start.sh'
 ]
 
