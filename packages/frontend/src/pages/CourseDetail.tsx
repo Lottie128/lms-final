@@ -1,9 +1,9 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Clock, Users, PlayCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, BookOpen, Clock, Users, PlayCircle, CheckCircle, Settings, FileText } from 'lucide-react';
 import { DashboardLayout } from '../components/layouts/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Loader } from '../components/ui/Loader';
 import { useAuth } from '../context/AuthContext';
@@ -80,7 +80,7 @@ export default function CourseDetail() {
 
   const course: Course = courseData;
   const isEnrolled = !!enrollmentData;
-  const isOwner = user?.role === 'TEACHER' && course.teacherId === user?.id;
+  const isOwner = (user?.role === 'TEACHER' || user?.role === 'ADMIN') && (course.teacherId === user?.id || user?.role === 'ADMIN');
 
   return (
     <DashboardLayout>
@@ -105,8 +105,8 @@ export default function CourseDetail() {
           </div>
 
           <CardHeader className="p-8">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex-1 min-w-0">
                 <div className="inline-block px-3 py-1 rounded-full bg-accent/10 dark:bg-accent-dark/10 text-accent dark:text-accent-dark text-sm font-medium mb-4">
                   {course.category || 'General'}
                 </div>
@@ -130,10 +130,11 @@ export default function CourseDetail() {
                 </div>
               </div>
 
-              {/* Enroll Button */}
-              {user?.role === 'STUDENT' && (
-                <div>
-                  {isEnrolled ? (
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                {/* Student Actions */}
+                {user?.role === 'STUDENT' && (
+                  isEnrolled ? (
                     <Button variant="secondary" disabled icon={<CheckCircle className="w-5 h-5" />}>
                       Enrolled
                     </Button>
@@ -145,18 +146,47 @@ export default function CourseDetail() {
                     >
                       Enroll Now
                     </Button>
-                  )}
-                </div>
-              )}
+                  )
+                )}
 
-              {isOwner && (
-                <Link to={`/courses/${id}/edit`}>
-                  <Button variant="primary">Edit Course</Button>
-                </Link>
-              )}
+                {/* Teacher/Admin Actions */}
+                {isOwner && (
+                  <>
+                    <Link to={`/courses/${id}/lessons`}>
+                      <Button variant="outline" icon={<FileText className="w-5 h-5" />}>
+                        Manage Lessons
+                      </Button>
+                    </Link>
+                    <Link to={`/courses/${id}/settings`}>
+                      <Button variant="primary" icon={<Settings className="w-5 h-5" />}>
+                        Settings
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </CardHeader>
         </Card>
+
+        {/* Teacher Info Banner */}
+        {isOwner && (
+          <Card className="p-4 bg-accent/5 dark:bg-accent-dark/5 border-accent/20 dark:border-accent-dark/20">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent/10 dark:bg-accent-dark/10 flex items-center justify-center">
+                <Settings className="w-5 h-5 text-accent dark:text-accent-dark" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-light-text-primary dark:text-dark-text-primary">
+                  You are viewing your course as an instructor
+                </p>
+                <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                  Use the buttons above to manage lessons and course settings
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Lessons */}
         <div>
@@ -170,9 +200,16 @@ export default function CourseDetail() {
               <h3 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary mb-2">
                 No lessons yet
               </h3>
-              <p className="text-light-text-secondary dark:text-dark-text-secondary">
-                The instructor is working on adding content
+              <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">
+                {isOwner ? 'Start adding lessons to your course' : 'The instructor is working on adding content'}
               </p>
+              {isOwner && (
+                <Link to={`/courses/${id}/lessons`}>
+                  <Button variant="primary" icon={<FileText className="w-5 h-5" />}>
+                    Add Lessons
+                  </Button>
+                </Link>
+              )}
             </Card>
           ) : (
             <div className="space-y-3">
@@ -184,9 +221,9 @@ export default function CourseDetail() {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
                   <Card
-                    hover={isEnrolled}
+                    hover={isEnrolled || isOwner}
                     className="p-4 cursor-pointer"
-                    onClick={() => isEnrolled && console.log('Open lesson', lesson.id)}
+                    onClick={() => (isEnrolled || isOwner) && console.log('Open lesson', lesson.id)}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-lg bg-accent/10 dark:bg-accent-dark/10 flex items-center justify-center flex-shrink-0">
@@ -201,21 +238,21 @@ export default function CourseDetail() {
                         <h4 className="font-medium text-light-text-primary dark:text-dark-text-primary mb-1">
                           {index + 1}. {lesson.title}
                         </h4>
-                        {lesson.description && (
+                        {lesson.content && (
                           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary line-clamp-1">
-                            {lesson.description}
+                            {lesson.content.substring(0, 100)}...
                           </p>
                         )}
                       </div>
 
-                      {lesson.duration && (
+                      {lesson.duration && (lesson.duration as any) > 0 && (
                         <div className="flex items-center gap-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
                           <Clock className="w-4 h-4" />
-                          <span>{Math.ceil(lesson.duration / 60)} min</span>
+                          <span>{lesson.duration} min</span>
                         </div>
                       )}
 
-                      {!isEnrolled && (
+                      {!isEnrolled && !isOwner && (
                         <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                           🔒
                         </div>

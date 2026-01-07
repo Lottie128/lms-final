@@ -15,6 +15,8 @@ const EmailConfirmation = lazy(() => import('../pages/EmailConfirmation'));
 const Profile = lazy(() => import('../pages/Profile'));
 const Settings = lazy(() => import('../pages/Settings'));
 const MyCourses = lazy(() => import('../pages/MyCourses'));
+const LessonManagement = lazy(() => import('../pages/LessonManagement'));
+const CourseSettings = lazy(() => import('../pages/CourseSettings'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -110,6 +112,22 @@ export function AppRoutes() {
           <ProtectedRoute>
             <CourseDetail />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/courses/:id/lessons"
+        element={
+          <TeacherRoute>
+            <LessonManagement />
+          </TeacherRoute>
+        }
+      />
+      <Route
+        path="/courses/:id/settings"
+        element={
+          <TeacherRoute>
+            <CourseSettings />
+          </TeacherRoute>
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />
