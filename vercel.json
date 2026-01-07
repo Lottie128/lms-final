@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cp -r ../shared ./shared && ls -la ../ && cat ../package.json && npm install --legacy-peer-deps && npm run build",
+  "buildCommand": "cp -r ../shared ./shared && pwd && ls -la && cat package.json && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "packages/frontend/dist",
   "framework": "vite",
   "installCommand": "echo 'Skipping root install'",
