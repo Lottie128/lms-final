@@ -1,9 +1,10 @@
 {
-  "buildCommand": "cd packages/frontend && cp -r ../shared ./shared && npm install && npm run build",
-  "outputDirectory": "packages/frontend/dist",
+  "buildCommand": "cp -r ../shared ./shared && npm install && npm run build",
+  "outputDirectory": "dist",
   "framework": "vite",
-  "installCommand": "cd packages/frontend && npm install",
-  "devCommand": "cd packages/frontend && npm run dev",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "rootDirectory": "packages/frontend",
   "rewrites": [
     {
       "source": "/(.*)",
