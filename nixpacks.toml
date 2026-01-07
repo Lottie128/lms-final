@@ -15,4 +15,4 @@ cmds = [
 ]
 
 [start]
-cmd = 'cd packages/backend && ~/.bun/bin/bun run start'
+cmd = 'cd packages/backend && npm start'
