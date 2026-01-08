@@ -41,6 +41,7 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
       body: t.Object({
         courseId: t.String(),
         title: t.String({ minLength: 3 }),
+        description: t.Optional(t.String()),
         content: t.Optional(t.String()),
         videoUrl: t.Optional(t.String()),
         order: t.Optional(t.Number()),
@@ -52,7 +53,7 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
   )
   .get(
     '/:id',
-    async ({ params: { id }, set }) => {
+    async ({ params: { id }, user, set }) => {
       const lesson = await prisma.lesson.findUnique({
         where: { id },
         include: {
@@ -61,6 +62,22 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
               id: true,
               title: true,
               teacher: { select: { id: true, name: true } },
+            },
+          },
+          assignments: {
+            include: {
+              submissions: {
+                where: user.role === 'STUDENT' ? { studentId: user.id } : undefined,
+                select: {
+                  id: true,
+                  grade: true,
+                  submittedAt: true,
+                  gradedAt: true,
+                },
+              },
+              _count: {
+                select: { submissions: true },
+              },
             },
           },
         },
@@ -107,6 +124,7 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
       params: t.Object({ id: t.String() }),
       body: t.Object({
         title: t.Optional(t.String({ minLength: 3 })),
+        description: t.Optional(t.String()),
         content: t.Optional(t.String()),
         videoUrl: t.Optional(t.String()),
         order: t.Optional(t.Number()),
