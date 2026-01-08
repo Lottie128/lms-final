@@ -56,6 +56,25 @@ export const courseRoutes = new Elysia({ prefix: '/courses' })
       tags: ['courses'],
     }
   )
+  .use(authMiddleware)
+  // Get teacher's own courses
+  .get(
+    '/my-courses',
+    async ({ user }) => {
+      const courses = await prisma.course.findMany({
+        where: { teacherId: user.id },
+        include: {
+          _count: { select: { enrollments: true, lessons: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      return { success: true, data: courses };
+    },
+    {
+      tags: ['courses'],
+    }
+  )
   .get(
     '/:id',
     async ({ params: { id }, set }) => {
@@ -83,7 +102,38 @@ export const courseRoutes = new Elysia({ prefix: '/courses' })
       tags: ['courses'],
     }
   )
-  .use(authMiddleware)
+  .get(
+    '/:id/lessons',
+    async ({ params: { id }, user, set }) => {
+      // Check if course exists and user has access
+      const course = await prisma.course.findUnique({
+        where: { id },
+        select: { teacherId: true },
+      });
+
+      if (!course) {
+        set.status = 404;
+        return { success: false, error: 'Course not found' };
+      }
+
+      // Teachers see all lessons, students only see published
+      const where: any = { courseId: id };
+      if (user.role === 'STUDENT') {
+        where.isPublished = true;
+      }
+
+      const lessons = await prisma.lesson.findMany({
+        where,
+        orderBy: { order: 'asc' },
+      });
+
+      return { success: true, data: lessons };
+    },
+    {
+      params: t.Object({ id: t.String() }),
+      tags: ['courses'],
+    }
+  )
   .post(
     '/',
     async ({ body, user, set }) => {
@@ -148,6 +198,8 @@ export const courseRoutes = new Elysia({ prefix: '/courses' })
         category: t.Optional(t.String()),
         thumbnail: t.Optional(t.String()),
         isPublished: t.Optional(t.Boolean()),
+        maxStudents: t.Optional(t.Number()),
+        enrollmentType: t.Optional(t.String()),
       }),
       tags: ['courses'],
     }
