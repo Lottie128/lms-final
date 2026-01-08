@@ -137,22 +137,44 @@ export const courseRoutes = new Elysia({ prefix: '/courses' })
   .post(
     '/',
     async ({ body, user, set }) => {
-      if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
-        set.status = 403;
-        return { success: false, error: 'Only teachers can create courses' };
+      try {
+        console.log('\n[COURSE CREATE] Starting course creation...');
+        console.log('[COURSE CREATE] User:', { id: user.id, role: user.role, name: user.name });
+        console.log('[COURSE CREATE] Body:', JSON.stringify(body, null, 2));
+
+        if (user.role !== 'TEACHER' && user.role !== 'ADMIN') {
+          console.log('[COURSE CREATE] Permission denied - user is not teacher/admin');
+          set.status = 403;
+          return { success: false, error: 'Only teachers can create courses' };
+        }
+
+        console.log('[COURSE CREATE] Creating course in database...');
+        const course = await prisma.course.create({
+          data: {
+            ...body,
+            teacherId: user.id,
+          },
+          include: {
+            teacher: { select: { id: true, name: true, avatar: true } },
+          },
+        });
+
+        console.log('[COURSE CREATE] Course created successfully:', course.id);
+        return { success: true, data: course };
+      } catch (error) {
+        console.error('[COURSE CREATE] Error creating course:');
+        console.error('[COURSE CREATE] Error type:', error instanceof Error ? error.constructor.name : typeof error);
+        console.error('[COURSE CREATE] Error message:', error instanceof Error ? error.message : String(error));
+        console.error('[COURSE CREATE] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        console.error('[COURSE CREATE] Full error:', error);
+        
+        set.status = 500;
+        return {
+          success: false,
+          error: 'Failed to create course',
+          details: error instanceof Error ? error.message : 'Unknown error',
+        };
       }
-
-      const course = await prisma.course.create({
-        data: {
-          ...body,
-          teacherId: user.id,
-        },
-        include: {
-          teacher: { select: { id: true, name: true, avatar: true } },
-        },
-      });
-
-      return { success: true, data: course };
     },
     {
       body: t.Object({
