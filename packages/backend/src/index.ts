@@ -9,6 +9,7 @@ import { enrollmentRoutes } from './routes/enrollments';
 import { progressRoutes } from './routes/progress';
 import { teacherRoutes } from './routes/teachers';
 import { errorHandler } from './middleware/errorHandler';
+import { prisma } from './lib/prisma';
 
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://lms-final.vercel.app';
@@ -25,12 +26,28 @@ console.log(`  NODE_ENV: ${process.env.NODE_ENV}\n`);
 
 const app = new Elysia()
   // Health check FIRST - before any other middleware
-  .get('/health', () => ({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'lms-backend',
-    version: '1.0.0',
-  }))
+  .get('/health', async () => {
+    try {
+      // Test database connection
+      await prisma.$queryRaw`SELECT 1`;
+      return {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        service: 'lms-backend',
+        version: '1.0.0',
+        database: 'connected',
+      };
+    } catch (error) {
+      return {
+        status: 'degraded',
+        timestamp: new Date().toISOString(),
+        service: 'lms-backend',
+        version: '1.0.0',
+        database: 'disconnected',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  })
   // Root endpoint for Railway health checks
   .get('/', () => ({
     message: 'IQ Didactic LMS API',
