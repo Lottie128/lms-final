@@ -1,30 +1,41 @@
 import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { supabase } from './supabase';
 
-// Get API URL from env and ensure /api prefix
+// Get API URL from env and ALWAYS ensure /api suffix
 const getBaseURL = (): string => {
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const envUrl = import.meta.env.VITE_API_URL;
   
-  if (!apiUrl) {
-    console.warn('VITE_API_URL not set, using localhost');
+  // Default for local development
+  if (!envUrl) {
+    console.warn('[API] VITE_API_URL not set, using localhost');
     return 'http://localhost:3001/api';
   }
   
-  // Remove trailing slash if present
-  const cleanUrl = apiUrl.replace(/\/$/, '');
-  // Add /api if not already present
-  const baseUrl = cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+  // Clean the URL - remove trailing slashes
+  let cleanUrl = envUrl.trim().replace(/\/+$/, '');
   
-  console.log('API Base URL:', baseUrl);
-  return baseUrl;
+  // Remove /api if it exists (we'll add it back to ensure consistency)
+  if (cleanUrl.endsWith('/api')) {
+    cleanUrl = cleanUrl.slice(0, -4);
+  }
+  
+  // Always add /api
+  const finalUrl = `${cleanUrl}/api`;
+  
+  console.log('[API] Environment URL:', envUrl);
+  console.log('[API] Final Base URL:', finalUrl);
+  
+  return finalUrl;
 };
 
+const baseURL = getBaseURL();
+
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000, // 30 second timeout
+  timeout: 30000,
 });
 
 // Request interceptor to add auth token
@@ -39,18 +50,17 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${session.access_token}`;
       }
     } catch (error) {
-      console.error('Error getting auth session:', error);
+      console.error('[API] Error getting auth session:', error);
     }
 
-    // Log request in development
-    if (import.meta.env.DEV) {
-      console.log(`[API] ${config.method?.toUpperCase()} ${config.url}`);
-    }
-
+    // Always log the full URL being called
+    const fullUrl = `${config.baseURL}${config.url}`;
+    console.log(`[API] ${config.method?.toUpperCase()} ${fullUrl}`);
+    
     return config;
   },
   (error: AxiosError) => {
-    console.error('Request interceptor error:', error);
+    console.error('[API] Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -62,22 +72,20 @@ api.interceptors.response.use(
   },
   async (error: AxiosError) => {
     const originalRequest = error.config;
+    const fullUrl = originalRequest ? `${originalRequest.baseURL}${originalRequest.url}` : 'unknown';
 
-    // Log error details
-    console.error('API Error:', {
-      url: originalRequest?.url,
-      method: originalRequest?.method,
+    console.error('[API] Error Response:', {
+      url: fullUrl,
+      method: originalRequest?.method?.toUpperCase(),
       status: error.response?.status,
-      message: error.message,
-      data: error.response?.data,
+      statusText: error.response?.statusText,
+      responseData: error.response?.data,
     });
 
     if (error.response?.status === 401) {
-      // Handle unauthorized access
-      console.log('Unauthorized - signing out');
+      console.log('[API] Unauthorized - signing out');
       await supabase.auth.signOut();
       
-      // Only redirect if not already on login page
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
@@ -86,6 +94,11 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Export for debugging in browser console
+if (typeof window !== 'undefined') {
+  (window as any).__API_BASE_URL__ = baseURL;
+}
 
 export { api };
 export default api;
