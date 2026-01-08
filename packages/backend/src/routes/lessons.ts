@@ -21,10 +21,17 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
         return { success: false, error: 'Unauthorized' };
       }
 
+      // Get the next order number
+      const lastLesson = await prisma.lesson.findFirst({
+        where: { courseId },
+        orderBy: { order: 'desc' },
+      });
+
       const lesson = await prisma.lesson.create({
         data: {
           ...lessonData,
           courseId,
+          order: lessonData.order ?? (lastLesson ? lastLesson.order + 1 : 0),
         },
       });
 
@@ -34,10 +41,9 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
       body: t.Object({
         courseId: t.String(),
         title: t.String({ minLength: 3 }),
-        description: t.Optional(t.String()),
-        content: t.String({ minLength: 10 }),
+        content: t.Optional(t.String()),
         videoUrl: t.Optional(t.String()),
-        order: t.Number(),
+        order: t.Optional(t.Number()),
         duration: t.Optional(t.Number()),
         isPublished: t.Optional(t.Boolean()),
       }),
@@ -57,7 +63,6 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
               teacher: { select: { id: true, name: true } },
             },
           },
-          assignments: true,
         },
       });
 
@@ -102,8 +107,7 @@ export const lessonRoutes = new Elysia({ prefix: '/lessons' })
       params: t.Object({ id: t.String() }),
       body: t.Object({
         title: t.Optional(t.String({ minLength: 3 })),
-        description: t.Optional(t.String()),
-        content: t.Optional(t.String({ minLength: 10 })),
+        content: t.Optional(t.String()),
         videoUrl: t.Optional(t.String()),
         order: t.Optional(t.Number()),
         duration: t.Optional(t.Number()),
