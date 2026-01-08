@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit, Trash2, GripVertical, Save, X, FileText, Video, FileImage } from 'lucide-react';
+import { Plus, Edit, Trash2, GripVertical, Save, FileText, Video } from 'lucide-react';
 import { DashboardLayout } from '../components/layouts/DashboardLayout';
 import { Card, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -21,7 +21,6 @@ export default function LessonManagement() {
     content: '',
     videoUrl: '',
     duration: 0,
-    order: 0,
   });
 
   const { data: course, isLoading: courseLoading } = useQuery({
@@ -42,11 +41,13 @@ export default function LessonManagement() {
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await api.post(`/courses/${courseId}/lessons`, data);
+      // Send courseId in body, not in URL
+      const response = await api.post('/lessons', { ...data, courseId });
       return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lessons', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course', courseId] });
       setIsCreating(false);
       resetForm();
     },
@@ -59,6 +60,7 @@ export default function LessonManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lessons', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course', courseId] });
       setEditingLesson(null);
       resetForm();
     },
@@ -71,6 +73,7 @@ export default function LessonManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lessons', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['course', courseId] });
     },
   });
 
@@ -80,7 +83,6 @@ export default function LessonManagement() {
       content: '',
       videoUrl: '',
       duration: 0,
-      order: lessons?.length || 0,
     });
   };
 
@@ -101,7 +103,6 @@ export default function LessonManagement() {
       content: lesson.content || '',
       videoUrl: lesson.videoUrl || '',
       duration: lesson.duration || 0,
-      order: lesson.order || 0,
     });
     setIsCreating(false);
   };
