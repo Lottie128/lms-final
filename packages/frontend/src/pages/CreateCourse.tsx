@@ -20,7 +20,18 @@ export default function CreateCourse() {
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await api.post('/courses', data);
+      // Only include thumbnail if it's not empty
+      const payload: any = {
+        title: data.title.trim(),
+        description: data.description.trim(),
+        category: data.category.trim(),
+      };
+      
+      if (data.thumbnail && data.thumbnail.trim()) {
+        payload.thumbnail = data.thumbnail.trim();
+      }
+      
+      const response = await api.post('/courses', payload);
       return response.data;
     },
     onSuccess: (data) => {
@@ -30,6 +41,23 @@ export default function CreateCourse() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Frontend validation
+    if (formData.title.trim().length < 3) {
+      alert('Course title must be at least 3 characters long');
+      return;
+    }
+    
+    if (formData.description.trim().length < 10) {
+      alert('Course description must be at least 10 characters long');
+      return;
+    }
+    
+    if (!formData.category.trim()) {
+      alert('Please select a category');
+      return;
+    }
+    
     createMutation.mutate(formData);
   };
 
@@ -76,20 +104,25 @@ export default function CreateCourse() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
+                minLength={3}
               />
 
               <div>
                 <label className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
-                  Description
+                  Description *
                 </label>
                 <textarea
                   className="w-full px-4 py-3 rounded-lg border border-light-border dark:border-dark-border bg-light-surface dark:bg-dark-surface text-light-text-primary dark:text-dark-text-primary focus:ring-2 focus:ring-accent dark:focus:ring-accent-dark focus:border-transparent transition-all resize-none"
                   rows={5}
-                  placeholder="Describe what students will learn in this course..."
+                  placeholder="Describe what students will learn in this course... (minimum 10 characters)"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   required
+                  minLength={10}
                 />
+                <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary mt-1">
+                  {formData.description.length}/10 characters minimum
+                </p>
               </div>
 
               <Input
