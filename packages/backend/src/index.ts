@@ -1,17 +1,52 @@
 import { Elysia } from 'elysia';
 import { cors } from '@elysiajs/cors';
 import { swagger } from '@elysiajs/swagger';
-import { authRoutes } from './routes/auth';
-import { courseRoutes } from './routes/courses';
-import { lessonRoutes } from './routes/lessons';
-import { assignmentRoutes } from './routes/assignments';
-import { enrollmentRoutes } from './routes/enrollments';
-import { progressRoutes } from './routes/progress';
-import { teacherRoutes } from './routes/teachers';
-import { errorHandler } from './middleware/errorHandler';
 
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+console.log('\n🔧 Starting IQ Didactic API...');
+console.log('📦 Loading environment variables...');
+console.log(`  ✓ PORT: ${PORT}`);
+console.log(`  ✓ FRONTEND_URL: ${FRONTEND_URL}`);
+console.log(`  ✓ NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+
+// Import dependencies with error handling
+let authRoutes, courseRoutes, lessonRoutes, assignmentRoutes, enrollmentRoutes, progressRoutes, teacherRoutes;
+let errorHandler;
+
+try {
+  console.log('\n📚 Loading route modules...');
+  
+  ({ authRoutes } = await import('./routes/auth'));
+  console.log('  ✓ Auth routes loaded');
+  
+  ({ courseRoutes } = await import('./routes/courses'));
+  console.log('  ✓ Course routes loaded');
+  
+  ({ lessonRoutes } = await import('./routes/lessons'));
+  console.log('  ✓ Lesson routes loaded');
+  
+  ({ assignmentRoutes } = await import('./routes/assignments'));
+  console.log('  ✓ Assignment routes loaded');
+  
+  ({ enrollmentRoutes } = await import('./routes/enrollments'));
+  console.log('  ✓ Enrollment routes loaded');
+  
+  ({ progressRoutes } = await import('./routes/progress'));
+  console.log('  ✓ Progress routes loaded');
+  
+  ({ teacherRoutes } = await import('./routes/teachers'));
+  console.log('  ✓ Teacher routes loaded');
+  
+  ({ errorHandler } = await import('./middleware/errorHandler'));
+  console.log('  ✓ Error handler loaded');
+  
+  console.log('\n✅ All modules loaded successfully!');
+} catch (error) {
+  console.error('\n❌ Failed to load route modules:', error);
+  process.exit(1);
+}
 
 const app = new Elysia()
   .use(
