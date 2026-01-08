@@ -112,6 +112,32 @@ export const enrollmentRoutes = new Elysia({ prefix: '/enrollments' })
       tags: ['enrollments'],
     }
   )
+  // Get student's enrolled courses
+  .get(
+    '/my-courses',
+    async ({ user }) => {
+      const enrollments = await prisma.enrollment.findMany({
+        where: { studentId: user.id },
+        include: {
+          course: {
+            include: {
+              teacher: { select: { id: true, name: true, avatar: true } },
+              _count: { select: { lessons: true } },
+            },
+          },
+        },
+        orderBy: { enrolledAt: 'desc' },
+      });
+
+      return {
+        success: true,
+        data: enrollments.map((e) => e.course),
+      };
+    },
+    {
+      tags: ['enrollments'],
+    }
+  )
   .get(
     '/course/:courseId',
     async ({ params: { courseId }, user, set }) => {
