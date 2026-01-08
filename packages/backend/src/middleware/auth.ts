@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia';
 import { supabase } from '../lib/supabase';
-import type { UserRole } from 'shared/types';
+
+export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN' | 'MODERATOR';
 
 export const authMiddleware = new Elysia().derive(async ({ headers, set }) => {
   const authHeader = headers.authorization;
