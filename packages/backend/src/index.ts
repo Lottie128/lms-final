@@ -21,8 +21,10 @@ console.log(`  NODE_ENV: ${process.env.NODE_ENV}\n`);
 const app = new Elysia()
   .use(
     cors({
-      origin: [FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'],
+      origin: true, // Allow all origins for now to debug
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
     })
   )
   .use(
