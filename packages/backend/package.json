@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "build": "bunx prisma generate",
-    "postinstall": "bunx prisma generate",
+    "build": "echo 'Prisma generated in nixpacks build phase'",
     "db:migrate": "bunx prisma migrate dev",
     "db:generate": "bunx prisma generate",
     "db:push": "bunx prisma db push",
