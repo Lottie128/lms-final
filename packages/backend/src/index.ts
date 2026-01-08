@@ -13,18 +13,65 @@ import { errorHandler } from './middleware/errorHandler';
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://lms-final.vercel.app';
 
+// Ensure FRONTEND_URL has protocol
+const normalizedFrontendUrl = FRONTEND_URL.startsWith('http')
+  ? FRONTEND_URL
+  : `https://${FRONTEND_URL}`;
+
 console.log('\n🚀 IQ Didactic API Starting...');
 console.log(`  PORT: ${PORT}`);
-console.log(`  FRONTEND: ${FRONTEND_URL}`);
+console.log(`  FRONTEND: ${normalizedFrontendUrl}`);
 console.log(`  NODE_ENV: ${process.env.NODE_ENV}\n`);
 
 const app = new Elysia()
+  // Health check FIRST - before any other middleware
+  .get('/health', () => ({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'lms-backend',
+    version: '1.0.0',
+  }))
+  // Root endpoint for Railway health checks
+  .get('/', () => ({
+    message: 'IQ Didactic LMS API',
+    version: '1.0.0',
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    docs: '/swagger',
+  }))
   .use(
     cors({
-      origin: true, // Allow all origins for now to debug
+      origin: (request) => {
+        const origin = request.headers.get('origin');
+        
+        // Allow requests with no origin (like health checks)
+        if (!origin) return true;
+        
+        // List of allowed origins
+        const allowedOrigins = [
+          normalizedFrontendUrl,
+          'http://localhost:5173',
+          'http://localhost:3000',
+          'https://lms-final.vercel.app',
+          'https://lms-final-frontend-rho.vercel.app',
+        ];
+        
+        // Check if origin is allowed
+        if (allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+          return true;
+        }
+        
+        // Allow any vercel.app subdomain
+        if (origin.includes('.vercel.app')) {
+          return true;
+        }
+        
+        console.log(`CORS blocked origin: ${origin}`);
+        return false;
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     })
   )
   .use(
@@ -47,18 +94,6 @@ const app = new Elysia()
       },
     })
   )
-  .get('/', () => ({
-    message: 'IQ Didactic LMS API',
-    version: '1.0.0',
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-  }))
-  .get('/health', () => ({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'lms-backend',
-    version: '1.0.0',
-  }))
   .group('/api', (app) =>
     app
       .use(authRoutes)
@@ -69,13 +104,37 @@ const app = new Elysia()
       .use(progressRoutes)
       .use(teacherRoutes)
   )
+  // Catch-all for unmatched routes
+  .all('*', ({ request, set }) => {
+    const url = new URL(request.url);
+    console.log(`404 Not Found: ${request.method} ${url.pathname}`);
+    set.status = 404;
+    return {
+      success: false,
+      error: 'Not Found',
+      message: `Route ${request.method} ${url.pathname} not found`,
+      availableEndpoints: [
+        'GET /',
+        'GET /health',
+        'GET /swagger',
+        'POST /api/auth/signup',
+        'POST /api/auth/login',
+        'GET /api/courses',
+        'GET /api/courses/my-courses',
+        'GET /api/teachers/stats',
+        'GET /api/enrollments/my-courses',
+      ],
+    };
+  })
   .onError(errorHandler)
-  .listen({ port: PORT, hostname: '0.0.0.0' });
+  .listen({ port: Number(PORT), hostname: '0.0.0.0' });
 
 console.log('\n✅ Server running on port', PORT);
 console.log('🔗 http://0.0.0.0:' + PORT);
 console.log('📚 Docs: http://0.0.0.0:' + PORT + '/swagger');
 console.log('\n📍 Registered API routes:');
+console.log('  ✓ GET /');
+console.log('  ✓ GET /health');
 console.log('  ✓ POST /api/auth/signup');
 console.log('  ✓ POST /api/auth/login');
 console.log('  ✓ GET  /api/courses');
