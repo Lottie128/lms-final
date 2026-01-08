@@ -1,7 +1,7 @@
 import { Elysia, t } from 'elysia';
 import { supabase } from '../lib/supabase';
 import { prisma } from '../lib/prisma';
-import type { UserRole } from 'shared/types';
+import type { UserRole } from '../middleware/auth';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
   .post(
