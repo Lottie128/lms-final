@@ -1,8 +1,18 @@
 import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { supabase } from './supabase';
 
+// Get API URL from env and add /api prefix
+const getBaseURL = () => {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  if (!apiUrl) {
+    return 'http://localhost:3001/api';
+  }
+  // Add /api if not already present
+  return apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
